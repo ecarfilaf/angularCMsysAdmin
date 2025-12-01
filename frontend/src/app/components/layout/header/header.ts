@@ -1,13 +1,17 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatMenuModule } from '@angular/material/menu';
-import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { Footer } from '../footer/footer';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { MatTreeModule } from '@angular/material/tree';
+import { Auth } from '../../../services/auth';
+import { Usuario } from '../../../interfaces/Usuario';
+import { MatDialog } from '@angular/material/dialog';
+import { Msgpanel } from '../msgpanel/msgpanel';
+import { CommonModule } from '@angular/common';
 
 interface FoodNode {
   name: string;
@@ -16,38 +20,63 @@ interface FoodNode {
 
 @Component({
 	selector: 'app-header',
-	imports: [MatButtonModule, MatIconModule, MatToolbarModule, MatTooltipModule, RouterLink, RouterLinkActive, RouterOutlet, MatSidenavModule, Footer, MatTreeModule, MatMenuModule],
+	imports: [MatButtonModule, MatIconModule, MatToolbarModule, MatTooltipModule, RouterLink, RouterLinkActive, MatSidenavModule, MatTreeModule, MatMenuModule, CommonModule],
 	templateUrl: './header.html',
 	styleUrl: './header.scss',
 })
-export class Header {
-	signin() {
-		console.log("Sign In clicked");
+export class Header {;
+	constructor(
+		private _authService: Auth,
+		private _router: Router,
+	) {}
+
+	readonly dialog = inject(MatDialog);
+
+	openDialog(title:string, message:string) {
+		this.dialog.open(Msgpanel, {data:{ title, message }});
 	}
-	dataSource = EXAMPLE_DATA;
+	
+	profile() { 
+		console.log("Profile link clicked");
+		setTimeout(() => {
+				this._router.navigate(['/profile']).then(() => {
+					window.location.reload();
+				});
+				}, 1200);
+	}
 
-	childrenAccessor = (node: FoodNode) => node.children ?? [];
+	isAuthenticated(): boolean {
+		// Implement your logic to check if the user is authenticated
+		//console.log("Checking authentication status.", this._authService.isAuthenticated());
+		return this._authService.isAuthenticated(); // Placeholder return value
+	}
 
-	hasChild = (_: number, node: FoodNode) => !!node.children && node.children.length > 0;
+	userData(): Usuario {
+		return this._authService.getUserData();
+	}
+
+	logout() {
+		console.log("Logout clicked");
+		// Implement your logout logic here
+		const user: Usuario = this._authService.getUserData();
+		console.log("User data for logout:", user);
+
+		this._authService.logout( user ).subscribe({
+			next: (response) => {
+				console.log("Logout successful:", response);
+				localStorage.removeItem('token');
+				this.openDialog('Logout Successful', 'You have been logged out successfully.');
+				setTimeout(() => {
+				this._router.navigate(['/']).then(() => {
+					window.location.reload();
+				});
+				}, 3600);
+			},
+			error: (error) => {
+				console.error("Logout failed:", error);
+				this.openDialog('Logout Failed', error.error.message || 'An unknown error occurred during logout.');
+			}
+		});
+	}
+
 }
-
-
-const EXAMPLE_DATA: FoodNode[] = [
-	{
-		name: 'Admin',
-		children: [{ name: 'Clients' }, { name: 'Products' }, { name: 'Orders' }],
-	},
-	{
-		name: 'Support',
-		children: [
-			{
-				name: 'Admin',
-				children: [{ name: 'Broccoli' }, { name: 'Brussels sprouts' }],
-			},
-			{
-				name: 'Parameters',
-				children: [{ name: 'Pumpkins' }, { name: 'Carrots' }],
-			},
-		],
-	},
-];

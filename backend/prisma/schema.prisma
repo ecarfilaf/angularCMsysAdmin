@@ -1,0 +1,345 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model exit_articulos {
+  IdArticulo       Int              @id @default(autoincrement())
+  CodFamilia       Int
+  CodSubFamilia    Int
+  CodMarca         Int
+  CodArticulo      String           @unique(map: "CodArticulo") @db.VarChar(30)
+  DescArticulo     String           @unique(map: "DescArticulo") @db.VarChar(50)
+  Talla            String           @db.VarChar(10)
+  SKU              String           @unique(map: "SKU") @default("") @db.VarChar(50)
+  CodBarra         String?          @default("") @db.VarChar(50)
+  FecVigencia      DateTime?        @db.DateTime(0)
+  Precio           Int              @default(0) @db.UnsignedInt
+  Stock            Int              @default(0) @db.UnsignedInt
+  Descuento        Int              @db.TinyInt
+  CodEstado        Int              @default(0)
+  FecIngReg        DateTime         @db.DateTime(0)
+  UsuIngReg        String           @db.VarChar(20)
+  FunIngReg        String           @db.VarChar(20)
+  FecModreg        DateTime         @db.DateTime(0)
+  UsuModreg        String           @db.VarChar(20)
+  FunModReg        String           @db.VarChar(20)
+  exit_familias    exit_familias    @relation(fields: [CodFamilia], references: [CodFamilia], onDelete: NoAction, onUpdate: NoAction, map: "fk_exit_articulo_exit_familia")
+  exit_marcas      exit_marcas      @relation(fields: [CodMarca], references: [CodMarca], onDelete: NoAction, onUpdate: NoAction, map: "fk_exit_articulo_exit_marca")
+  exit_subfamilias exit_subfamilias @relation(fields: [CodSubFamilia], references: [CodSubFamilia], onDelete: NoAction, onUpdate: NoAction, map: "fk_exit_articulo_exit_sub_familia")
+  par_estados      par_estados      @relation(fields: [CodEstado], references: [CodEstado], onDelete: NoAction, onUpdate: NoAction, map: "fk_exit_articulo_par_estado")
+
+  @@index([CodFamilia], map: "fk_exit_articulo_exit_familia")
+  @@index([CodMarca], map: "fk_exit_articulo_exit_marca")
+  @@index([CodSubFamilia], map: "fk_exit_articulo_exit_sub_familia")
+  @@index([CodEstado], map: "fk_exit_articulo_par_estado")
+}
+
+model exit_categorias {
+  CodCategoria            Int                       @id
+  DescCategoria           String                    @unique(map: "DescCategoria") @db.VarChar(35)
+  OrderCategoria          Int
+  CodEstado               Int                       @default(0)
+  FecIngReg               DateTime                  @db.DateTime(0)
+  UsuIngReg               String                    @db.VarChar(20)
+  FunIngReg               String                    @db.VarChar(20)
+  FecModreg               DateTime                  @db.DateTime(0)
+  UsuModreg               String                    @db.VarChar(20)
+  FunModReg               String                    @db.VarChar(20)
+  par_estados             par_estados               @relation(fields: [CodEstado], references: [CodEstado], onDelete: NoAction, onUpdate: NoAction, map: "fk_exit_Categorias_par_estado")
+  exit_rel_cat_fam_subfam exit_rel_cat_fam_subfam[]
+
+  @@index([CodEstado], map: "fk_exit_Categorias_par_estado")
+}
+
+model exit_familias {
+  CodFamilia              Int                       @id
+  DescFamilia             String                    @unique(map: "DescFamilia") @db.VarChar(35)
+  CodEstado               Int                       @default(0)
+  FecIngReg               DateTime                  @db.DateTime(0)
+  UsuIngReg               String                    @db.VarChar(20)
+  FunIngReg               String                    @db.VarChar(20)
+  FecModreg               DateTime                  @db.DateTime(0)
+  UsuModreg               String                    @db.VarChar(20)
+  FunModReg               String                    @db.VarChar(20)
+  exit_articulos          exit_articulos[]
+  par_estados             par_estados               @relation(fields: [CodEstado], references: [CodEstado], onDelete: NoAction, onUpdate: NoAction, map: "fk_exit_familias_par_estado")
+  exit_rel_cat_fam_subfam exit_rel_cat_fam_subfam[]
+
+  @@index([CodEstado], map: "fk_exit_familias_par_estado")
+}
+
+model exit_marcas {
+  CodMarca       Int              @id
+  DescMarca      String           @unique(map: "DescMarca") @db.VarChar(50)
+  CodEstado      Int              @default(0)
+  FecIngReg      DateTime         @db.DateTime(0)
+  UsuIngReg      String           @db.VarChar(20)
+  FunIngReg      String           @db.VarChar(20)
+  FecModreg      DateTime         @db.DateTime(0)
+  UsuModreg      String           @db.VarChar(20)
+  FunModReg      String           @db.VarChar(20)
+  exit_articulos exit_articulos[]
+  par_estados    par_estados      @relation(fields: [CodEstado], references: [CodEstado], onDelete: NoAction, onUpdate: NoAction, map: "fk_exit_marcas_par_estado")
+
+  @@index([CodEstado], map: "fk_exit_marcas_par_estado")
+}
+
+model exit_rel_cat_fam_subfam {
+  CodCategoria     Int
+  CodFamilia       Int
+  CodSubFamilia    Int
+  CodEstado        Int              @default(0)
+  FecIngReg        DateTime         @db.DateTime(0)
+  UsuIngReg        String           @db.VarChar(20)
+  FunIngReg        String           @db.VarChar(20)
+  FecModreg        DateTime         @db.DateTime(0)
+  UsuModreg        String           @db.VarChar(20)
+  FunModReg        String           @db.VarChar(20)
+  exit_categorias  exit_categorias  @relation(fields: [CodCategoria], references: [CodCategoria], onDelete: NoAction, onUpdate: NoAction, map: "fk_exit_rel_cat_fam_subfam_exit_categoria")
+  exit_familias    exit_familias    @relation(fields: [CodFamilia], references: [CodFamilia], onDelete: NoAction, onUpdate: NoAction, map: "fk_exit_rel_cat_fam_subfam_exit_familia")
+  exit_subfamilias exit_subfamilias @relation(fields: [CodSubFamilia], references: [CodSubFamilia], onDelete: NoAction, onUpdate: NoAction, map: "fk_exit_rel_cat_fam_subfam_exit_subfamillia")
+  par_estados      par_estados      @relation(fields: [CodEstado], references: [CodEstado], onDelete: NoAction, onUpdate: NoAction, map: "fk_exit_rel_cat_fam_subfam_par_estado")
+
+  @@id([CodCategoria, CodFamilia, CodSubFamilia])
+  @@index([CodFamilia], map: "fk_exit_rel_cat_fam_subfam_exit_familia")
+  @@index([CodSubFamilia], map: "fk_exit_rel_cat_fam_subfam_exit_subfamillia")
+  @@index([CodEstado], map: "fk_exit_rel_cat_fam_subfam_par_estado")
+}
+
+model exit_subfamilias {
+  CodSubFamilia           Int                       @id
+  DescSubFamilia          String                    @unique(map: "DescSubFamilia") @db.VarChar(35)
+  CodEstado               Int                       @default(0)
+  FecIngReg               DateTime                  @db.DateTime(0)
+  UsuIngReg               String                    @db.VarChar(20)
+  FunIngReg               String                    @db.VarChar(20)
+  FecModreg               DateTime                  @db.DateTime(0)
+  UsuModreg               String                    @db.VarChar(20)
+  FunModReg               String                    @db.VarChar(20)
+  exit_articulos          exit_articulos[]
+  exit_rel_cat_fam_subfam exit_rel_cat_fam_subfam[]
+  par_estados             par_estados               @relation(fields: [CodEstado], references: [CodEstado], onDelete: NoAction, onUpdate: NoAction, map: "fk_exit_subfamilias_par_estado")
+
+  @@index([CodEstado], map: "fk_exit_subfamilias_par_estado")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model glb_datos {
+  DataId    Int      @id
+  Rut       String   @unique(map: "Rut") @db.VarChar(15)
+  Nombres   String   @db.VarChar(30)
+  APaterno  String   @db.VarChar(20)
+  AMaterno  String?  @db.VarChar(20)
+  CodEstado Int
+  FecIngReg DateTime @db.DateTime(0)
+  UsuIngReg String   @db.VarChar(20)
+  FunIngReg String   @db.VarChar(20)
+  FecModreg DateTime @db.DateTime(0)
+  UsuModreg String   @db.VarChar(20)
+  FunModReg String   @db.VarChar(20)
+
+  @@index([CodEstado], map: "fk_glb_datos_par_estado_idx")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model glb_divisiones {
+  EmpId        Int
+  DivId        Int
+  DivDesc      String         @unique(map: "DivDesc") @db.VarChar(30)
+  CodEstado    Int
+  FecIngReg    DateTime       @db.DateTime(0)
+  UsuIngReg    String         @db.VarChar(20)
+  FunIngReg    String         @db.VarChar(20)
+  FecModreg    DateTime       @db.DateTime(0)
+  UsuModreg    String         @db.VarChar(20)
+  FunModReg    String         @db.VarChar(20)
+  glb_empresas glb_empresas   @relation(fields: [EmpId], references: [EmpId], onDelete: NoAction, onUpdate: NoAction, map: "fk_glb_division_glb_empresa")
+  par_estados  par_estados    @relation(fields: [CodEstado], references: [CodEstado], onDelete: NoAction, onUpdate: NoAction, map: "fk_glb_division_par_estado")
+  glb_unidades glb_unidades[]
+
+  @@id([EmpId, DivId])
+  @@index([CodEstado], map: "fk_glb_division_par_estado")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model glb_empresas {
+  EmpId          Int              @id
+  EmpDesc        String           @unique(map: "EmpDesc") @db.VarChar(30)
+  RazonSocial    String           @db.VarChar(50)
+  Rut            Int
+  Dv             String           @db.VarChar(1)
+  CodEstado      Int
+  FecIngReg      DateTime         @db.DateTime(0)
+  UsuIngReg      String           @db.VarChar(20)
+  FunIngReg      String           @db.VarChar(20)
+  FecModreg      DateTime         @db.DateTime(0)
+  UsuModreg      String           @db.VarChar(20)
+  FunModReg      String           @db.VarChar(20)
+  glb_divisiones glb_divisiones[]
+  par_estados    par_estados      @relation(fields: [CodEstado], references: [CodEstado], onDelete: NoAction, onUpdate: NoAction, map: "fk_glb_empresa_par_estado")
+
+  @@index([CodEstado], map: "fk_glb_empresa_par_estado")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model glb_unidades {
+  EmpId                Int
+  DivId                Int
+  UniId                Int
+  UniDesc              String                 @unique(map: "UniDesc_UNIQUE") @db.VarChar(30)
+  CodEstado            Int
+  FecIngReg            DateTime               @db.DateTime(0)
+  UsuIngReg            String                 @db.VarChar(20)
+  FunIngReg            String                 @db.VarChar(20)
+  FecModreg            DateTime               @db.DateTime(0)
+  UsuModreg            String                 @db.VarChar(20)
+  FunModReg            String                 @db.VarChar(20)
+  glb_divisiones       glb_divisiones         @relation(fields: [EmpId, DivId], references: [EmpId, DivId], onDelete: NoAction, onUpdate: NoAction, map: "fk_glb_unidad_glb_division")
+  par_estados          par_estados            @relation(fields: [CodEstado], references: [CodEstado], onDelete: NoAction, onUpdate: NoAction, map: "fk_glb_unidad_par_estado")
+  rel_empresa_usuarios rel_empresa_usuarios[]
+
+  @@id([EmpId, DivId, UniId])
+  @@index([CodEstado], map: "fk_glb_unidad_par_estado")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model par_estados {
+  CodEstado               Int                       @id
+  DescEstado              String                    @unique(map: "DescEstado") @db.VarChar(20)
+  FecIngReg               DateTime                  @db.DateTime(0)
+  UsuIngReg               String                    @db.VarChar(20)
+  FunIngReg               String                    @db.VarChar(20)
+  FecModreg               DateTime                  @db.DateTime(0)
+  UsuModreg               String                    @db.VarChar(20)
+  FunModReg               String                    @db.VarChar(20)
+  exit_articulos          exit_articulos[]
+  exit_categorias         exit_categorias[]
+  exit_familias           exit_familias[]
+  exit_marcas             exit_marcas[]
+  exit_rel_cat_fam_subfam exit_rel_cat_fam_subfam[]
+  exit_subfamilias        exit_subfamilias[]
+  glb_divisiones          glb_divisiones[]
+  glb_empresas            glb_empresas[]
+  glb_unidades            glb_unidades[]
+  rel_empresa_usuarios    rel_empresa_usuarios[]
+  usu_usuarios            usu_usuarios[]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model par_tipo_usuarios {
+  CodTipoUsuario  Int            @id
+  DescTipoUsuario String         @unique(map: "DescTipoRegistro") @db.VarChar(20)
+  FecIngReg       DateTime       @db.DateTime(0)
+  UsuIngReg       String         @db.VarChar(20)
+  FunIngReg       String         @db.VarChar(20)
+  FecModreg       DateTime       @db.DateTime(0)
+  UsuModreg       String         @db.VarChar(20)
+  FunModReg       String         @db.VarChar(20)
+  usu_usuarios    usu_usuarios[]
+}
+
+model prop_postdetails {
+  IdPostDetail Int        @id @default(autoincrement())
+  IdPost       Int
+  DescPost     String     @db.Text
+  Utilities    String?    @db.VarChar(50)
+  Pet          String     @db.VarChar(50)
+  Income       String     @db.VarChar(50)
+  Size         Int
+  School       Int
+  Bus          Int
+  Restaurant   Int
+  CodEstado    Int
+  FecIngReg    DateTime   @db.DateTime(0)
+  UsuIngReg    String     @db.VarChar(20)
+  FunIngReg    String     @db.VarChar(20)
+  FecModreg    DateTime   @db.DateTime(0)
+  UsuModreg    String     @db.VarChar(20)
+  FunModReg    String     @db.VarChar(20)
+  prop_posts   prop_posts @relation(fields: [IdPost], references: [IdPost], onDelete: NoAction, onUpdate: NoAction, map: "fk_prop_postdetails_prop_posts")
+
+  @@index([IdPost], map: "fk_prop_postdetails_prop_posts")
+}
+
+model prop_posts {
+  IdPost           Int                @id @default(autoincrement())
+  UsuRut           Int
+  Title            String             @db.VarChar(30)
+  Price            Float              @db.Float
+  Image            String             @db.VarChar(150)
+  Address          String             @db.VarChar(50)
+  City             String             @db.VarChar(30)
+  Bedrooms         Int
+  Bathrooms        Int
+  Latitude         String             @db.VarChar(30)
+  Longitude        String             @db.VarChar(30)
+  Type             String             @db.VarChar(10)
+  Property         String             @db.VarChar(10)
+  CodEstado        Int
+  FecIngReg        DateTime           @db.DateTime(0)
+  UsuIngReg        String             @db.VarChar(20)
+  FunIngReg        String             @db.VarChar(20)
+  FecModReg        DateTime           @db.DateTime(0)
+  UsuModReg        String             @db.VarChar(20)
+  FunModReg        String             @db.VarChar(20)
+  prop_postdetails prop_postdetails[]
+  usu_usuarios     usu_usuarios       @relation(fields: [UsuRut], references: [UsuRut], onDelete: NoAction, onUpdate: NoAction, map: "fk_prop_posts_usu_usuarios")
+
+  @@index([UsuRut], map: "fk_prop_posts_usu_usuarios")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model rel_empresa_usuarios {
+  EmpId        Int
+  DivId        Int
+  UniId        Int
+  UsuRut       Int
+  CodEstado    Int
+  FecIngReg    DateTime     @db.DateTime(0)
+  UsuIngReg    String       @db.VarChar(20)
+  FunIngReg    String       @db.VarChar(20)
+  FecModreg    DateTime     @db.DateTime(0)
+  UsuModreg    String       @db.VarChar(20)
+  FunModReg    String       @db.VarChar(20)
+  glb_unidades glb_unidades @relation(fields: [EmpId, DivId, UniId], references: [EmpId, DivId, UniId], onDelete: NoAction, onUpdate: NoAction, map: "fk_glb_unidad_rel_empresa")
+  par_estados  par_estados  @relation(fields: [CodEstado], references: [CodEstado], onDelete: NoAction, onUpdate: NoAction, map: "fk_rel_empresa_usuario_par_estado")
+  usu_usuarios usu_usuarios @relation(fields: [UsuRut], references: [UsuRut], onDelete: NoAction, onUpdate: NoAction, map: "fk_usu_usuarios_rel_empresa")
+
+  @@id([EmpId, DivId, UniId, UsuRut])
+  @@index([CodEstado], map: "fk_rel_empresa_usuario_par_estado")
+  @@index([UsuRut], map: "fk_usu_usuarios_rel_empresa")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model usu_usuarios {
+  UsuRut               Int                    @id
+  UsuDv                String                 @db.VarChar(1)
+  UsuNombres           String                 @db.VarChar(30)
+  UsuAPaterno          String                 @db.VarChar(20)
+  UsuAMaterno          String?                @db.VarChar(20)
+  UsuUsuario           String                 @unique(map: "UsuUsuario") @db.VarChar(20)
+  UsuClave             String                 @db.Text
+  CodEstado            Int                    @default(0)
+  CodTipoUsuario       Int
+  FecVigencia          DateTime?              @db.DateTime(0)
+  UsuEmail             String                 @db.VarChar(30)
+  UsuAvatar            String?                @db.VarChar(150)
+  FecIngReg            DateTime               @db.DateTime(0)
+  UsuIngReg            String                 @db.VarChar(20)
+  FunIngReg            String                 @db.VarChar(20)
+  FecModReg            DateTime               @db.DateTime(0)
+  UsuModReg            String                 @db.VarChar(20)
+  FunModReg            String                 @db.VarChar(20)
+  prop_posts           prop_posts[]
+  rel_empresa_usuarios rel_empresa_usuarios[]
+  par_estados          par_estados            @relation(fields: [CodEstado], references: [CodEstado], onDelete: NoAction, onUpdate: NoAction, map: "fk_usu_usuarios_par_estado")
+  par_tipo_usuarios    par_tipo_usuarios      @relation(fields: [CodTipoUsuario], references: [CodTipoUsuario], onDelete: NoAction, onUpdate: NoAction, map: "fk_usu_usuarios_par_tipo_usuario")
+
+  @@index([CodEstado], map: "fk_usu_usuarios_par_estado_idx")
+  @@index([CodTipoUsuario], map: "fk_usu_usuarios_par_tipo_usuario_idx")
+}

@@ -1,40 +1,20 @@
-<mat-drawer-container class="mat-drawer-container">
+<div class="d-flex w-100">
 	<!-- Sidebar Component -->
-	<mat-drawer #drawer opened class="mat-drawer-sidenav" mode="side">
-		<div class="mb-3">
-			<a href="/">
-				<img src="/images/logo-cm.png" alt="C-M Gestion Logo" class="header-logo" />
-			</a>
-		</div>
-		<mat-tree class="mat-tree" #tree [dataSource]="dataSource" [childrenAccessor]="childrenAccessor">
-			<!-- This is the tree node template for leaf nodes -->
-			<mat-tree-node *matTreeNodeDef="let node" matTreeNodePadding>
-				<!-- use a disabled button to provide padding for tree leaf -->
-				{{node.name}}
-				<button matIconButton disabled></button>
-			</mat-tree-node>
-			<!-- This is the tree node template for expandable nodes -->
-			<mat-tree-node *matTreeNodeDef="let node;when: hasChild" matTreeNodePadding matTreeNodeToggle
-				[cdkTreeNodeTypeaheadLabel]="node.name">
-				{{node.name}}
-				<button matIconButton matTreeNodeToggle [attr.aria-label]="'Toggle ' + node.name">
-					<mat-icon class="mat-icon-rtl-mirror">
-						{{tree.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
-					</mat-icon>
-				</button>
-			</mat-tree-node>
-		</mat-tree>
-	</mat-drawer>
+	<div class="mb-0">
+		<a href="/">
+			<img src="/images/logo-cm.png" alt="C-M Gestion Logo" class="header-logo" />
+		</a>
+	</div>
 	<!-- Header Component -->
-	<header>
+	<header class="w-100">
 		<div class="d-flex flex-wrap  justify-content-md-between w-100">
 			<mat-toolbar>
-				<button matIconButton class="example-icon" aria-label="Example icon-button with menu icon"
-					(click)="drawer.toggle()">
+				<button matIconButton class="example-icon" aria-label="Example icon-button with menu icon">
 					<mat-icon class="light-icon" matTooltip="Menu Options">menu_open</mat-icon>
 				</button>
 				<span>C-M Gestion</span>
 				<span class="example-spacer"></span>
+				@if (isAuthenticated()) {
 				<button matIconButton>
 					<mat-icon matTooltip="Messages...">mail</mat-icon>
 				</button>
@@ -44,9 +24,13 @@
 				<button matIconButton>
 					<mat-icon matTooltip="Search...">search</mat-icon>
 				</button>
-				<button (click)="signin()" routerLink="/signin" routerLinkActive="active" matIconButton aria-label="Example icon-button with login icon">
+				}
+				@else {
+				<button routerLink="/signin" routerLinkActive="active" matIconButton
+					aria-label="Example icon-button with login icon">
 					<mat-icon class="light-icon" matTooltip="Login.../Register...">login</mat-icon>
 				</button>
+				}
 				<button matIconButton>
 					<mat-icon matTooltip="Help...">help</mat-icon>
 				</button>
@@ -56,6 +40,7 @@
 				<button matIconButton>
 					<mat-icon matTooltip="Theme...">format_color_fill</mat-icon>
 				</button>
+				@if (isAuthenticated()) {
 				<button matIconButton>
 					<mat-icon matTooltip="Share">share</mat-icon>
 				</button>
@@ -65,12 +50,12 @@
 				<button matIconButton>
 					<mat-icon matTooltip="Shopping Cart...">shopping_cart</mat-icon>
 				</button>
-				<button class="user-avatar" matIconButton [matMenuTriggerFor]="menu">
-					<div class="image-button"></div>
-					<span class="user-name">Jonh Doe</span>
+				<button class="user-avatar" matIconButton [matMenuTriggerFor]="menu" >
+					<div class="image-button" style="background-image: url('/images/avatars/{{userData().UsuAvatar}}');"></div>
+					<span class="user-name">{{userData().UsuNombres}} {{userData().UsuAPaterno}}</span>
 				</button>
 				<mat-menu #menu="matMenu">
-					<button mat-menu-item routerLink="/profile" routerLinkActive="active">
+					<button mat-menu-item (click)="profile()">
 						<mat-icon>person</mat-icon>
 						<span>Profile</span>
 					</button>
@@ -87,18 +72,13 @@
 						<span>User Settings</span>
 					</button>
 					<hr>
-					<button mat-menu-item matTooltip="Logout">
+					<button (click)="logout()" mat-menu-item matTooltip="Logout">
 						<mat-icon>logout</mat-icon>
 						<span>Logout</span>
 					</button>
 				</mat-menu>
+				}
 			</mat-toolbar>
 		</div>
 	</header>
-	<!-- Content Component -->
-	<main class="main-content">
-		<router-outlet></router-outlet>
-	</main>
-	<!-- Footer Component -->
-	<app-footer></app-footer>
-</mat-drawer-container>
+</div>

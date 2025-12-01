@@ -55,12 +55,12 @@
 								</div>
 							</div>
 							<form class="">
-								<div class="mb-3"><label class="form-label">Email</label><input name="email"
+								<div class="mb-3"><label class="form-label">Email</label><input [(ngModel)]="email" name="email"
 										placeholder="Enter your email" type="email" class="form-control form-control-lg"
-										value="demo@bootlab.io"></div>
-								<div class="mb-3"><label class="form-label">Password</label><input name="password"
+										value="{{email}}"></div>
+								<div class="mb-3"><label class="form-label">Password</label><input [(ngModel)]="password" name="password"
 										placeholder="Enter your password" type="password"
-										class="form-control form-control-lg" value="unsafepassword"><small><a
+										class="form-control form-control-lg" value="{{password}}"><small><a
 											href="/resetpassword">Forgot
 											password?</a></small></div>
 								<div>
@@ -69,7 +69,7 @@
 											class="form-check-label">Remember
 											me</label></div>
 								</div>
-								<div class="d-grid gap-2 mt-3"><button matButton="filled">Login</button></div>
+								<div class="d-grid gap-2 mt-3"><button (click)="login()" type="submit" matButton="filled">Login</button></div>
 							</form>
 							<div class="text-center mt-3">Don't have an account? <a class="button" routerLink="/signup" routerLinkActive="active"> Sign up</a>
 							</div>
